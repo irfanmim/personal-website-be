@@ -1,0 +1,68 @@
+name: Deploy Laravel API
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Setup PHP
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, intl, pdo_mysql
+          coverage: none
+
+      # Install Composer dependencies
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      # Setup SSH
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.HOSTINGER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.HOSTINGER_PORT }} -H "${{ secrets.HOSTINGER_HOST }}" >> ~/.ssh/known_hosts
+
+      # Sync files to server
+      - name: Sync files to Hostinger
+        run: |
+          rsync -az \
+            -e "ssh -p ${{ secrets.HOSTINGER_PORT }}" \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'node_modules/' \
+            --exclude 'tests/' \
+            --exclude '.env' \
+            ./ \
+            ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH }}/
+
+      # Run Laravel commands on server
+      - name: Run Laravel commands on server
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_PORT }} \
+          ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }} << 'EOF'
+
+            cd ${{ secrets.HOSTINGER_PATH }}
+
+            # Install dependencies on server
+            composer install --no-dev --optimize-autoloader
+
+            # Run database migration
+            php artisan migrate --force
+
+            # Cache optimization
+            php artisan optimize:clear
+            php artisan optimize
+
+            # Fix permissions
+            chmod -R 775 storage bootstrap/cache
