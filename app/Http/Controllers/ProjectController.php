@@ -34,12 +34,13 @@ class ProjectController extends Controller
         $maxOrder = Project::max('order') ?? -1;
 
         $project = Project::create([
-            'title'       => $request->title,
-            'description' => $request->description,
-            'tags'        => $request->tags,
-            'demo'        => $request->demo ?? '',
-            'image'       => $this->resolveImagePath($request),
-            'order'       => $maxOrder + 1,
+            'title'          => $request->title,
+            'description'    => $request->description,
+            'tags'           => $request->tags,
+            'demo'           => $request->demo ?? '',
+            'show_demo_soon' => (bool) $request->input('show_demo_soon', false),
+            'image'          => $this->resolveImagePath($request),
+            'order'          => $maxOrder + 1,
         ]);
 
         return response()->json($project, 201);
@@ -55,11 +56,12 @@ class ProjectController extends Controller
         }
 
         $project->update([
-            'title'       => $request->title,
-            'description' => $request->description,
-            'tags'        => $request->tags,
-            'demo'        => $request->demo ?? '',
-            'image'       => $this->resolveImagePath($request, $project->image),
+            'title'          => $request->title,
+            'description'    => $request->description,
+            'tags'           => $request->tags,
+            'demo'           => $request->demo ?? '',
+            'show_demo_soon' => (bool) $request->input('show_demo_soon', false),
+            'image'          => $this->resolveImagePath($request, $project->image),
         ]);
 
         return response()->json($project->fresh());

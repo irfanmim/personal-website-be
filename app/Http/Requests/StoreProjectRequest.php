@@ -18,7 +18,8 @@ class StoreProjectRequest extends FormRequest
             'description' => ['required', 'string', 'max:500'],
             'tags'        => ['required', 'array'],
             'tags.*'      => ['string'],
-            'demo'        => ['nullable', 'url', 'max:300'],
+            'demo'           => ['nullable', 'url', 'max:300'],
+            'show_demo_soon' => ['nullable', 'boolean'],
             'image'       => $this->hasFile('image')
                 ? ['nullable', 'file', 'image', 'mimes:jpeg,jpg,png,gif,webp', 'max:5120']
                 : ['nullable', 'string', 'max:500'],
