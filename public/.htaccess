@@ -1,9 +1,15 @@
+Options +FollowSymLinks
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
+
+    # Pass OPTIONS preflight to Laravel so CORS middleware can set headers
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule .* index.php [L]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
