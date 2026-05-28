@@ -39,10 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/content/contact', [ContentController::class, 'updateContact']);
 
     // Projects — reorder MUST come before /{id} to avoid routing conflicts
-    Route::put('/projects/reorder', [ProjectController::class, 'reorder']);
-    Route::post('/projects',        [ProjectController::class, 'store']);
-    Route::put('/projects/{id}',    [ProjectController::class, 'update']);
-    Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+    Route::put('/projects/reorder',              [ProjectController::class, 'reorder']);
+    Route::post('/projects',                     [ProjectController::class, 'store']);
+    Route::match(['PUT', 'POST'], '/projects/{id}', [ProjectController::class, 'update']);
+    Route::delete('/projects/{id}',              [ProjectController::class, 'destroy']);
 
     // Experiences — reorder MUST come before /{id}
     Route::put('/experiences/reorder',                              [ExperienceController::class, 'reorder']);

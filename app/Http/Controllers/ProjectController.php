@@ -8,6 +8,8 @@ use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -36,7 +38,7 @@ class ProjectController extends Controller
             'description' => $request->description,
             'tags'        => $request->tags,
             'demo'        => $request->demo ?? '',
-            'image'       => $request->image ?? '',
+            'image'       => $this->resolveImagePath($request),
             'order'       => $maxOrder + 1,
         ]);
 
@@ -57,7 +59,7 @@ class ProjectController extends Controller
             'description' => $request->description,
             'tags'        => $request->tags,
             'demo'        => $request->demo ?? '',
-            'image'       => $request->image ?? '',
+            'image'       => $this->resolveImagePath($request, $project->image),
         ]);
 
         return response()->json($project->fresh());
@@ -72,6 +74,7 @@ class ProjectController extends Controller
             return response()->json(['error' => 'Project not found'], 404);
         }
 
+        $this->deleteStoredImage($project->image);
         $project->delete();
 
         return response()->noContent();
@@ -88,5 +91,32 @@ class ProjectController extends Controller
         }
 
         return response()->json(['reordered' => true]);
+    }
+
+    private function resolveImagePath(StoreProjectRequest $request, string $existing = ''): string
+    {
+        if ($request->hasFile('image')) {
+            $this->deleteStoredImage($existing);
+            $path = $request->file('image')->storeAs(
+                'projects',
+                Str::uuid() . '.' . $request->file('image')->extension(),
+                'public'
+            );
+            return Storage::disk('public')->url($path);
+        }
+        if ($request->filled('image')) return $request->image;
+        return $existing;
+    }
+
+    private function deleteStoredImage(string $image): void
+    {
+        if (!$image || str_starts_with($image, '/images/')) return;
+        $parsed   = parse_url($image, PHP_URL_PATH);
+        $diskPath = ltrim(str_replace('/storage/', '', $parsed), '/');
+        // Only delete files we stored — never touch anything outside projects/
+        if (!str_starts_with($diskPath, 'projects/')) return;
+        if (Storage::disk('public')->exists($diskPath)) {
+            Storage::disk('public')->delete($diskPath);
+        }
     }
 }

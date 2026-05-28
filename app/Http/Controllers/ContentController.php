@@ -9,7 +9,6 @@ use App\Models\About;
 use App\Models\Contact;
 use App\Models\ExperienceRole;
 use App\Models\Hero;
-use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 
 class ContentController extends Controller
@@ -24,7 +23,6 @@ class ContentController extends Controller
             'hero'        => Hero::first(),
             'about'       => About::first(),
             'contact'     => $this->formatContact(Contact::first()),
-            'projects'    => Project::orderBy('order')->get(),
             'experiences' => ExperienceRole::with(['companies' => fn ($q) => $q->orderBy('order')])
                                 ->orderBy('order')
                                 ->get(),
