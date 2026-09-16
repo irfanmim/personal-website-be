@@ -1,57 +1,106 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Personal Website API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A stateless Laravel JSON API that powers the backend of a personal portfolio website: public content endpoints for the site itself, and Sanctum-protected admin endpoints for managing that content.
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The site's content (hero, about, contact, projects, experience) lives in the database and is fully editable through an authenticated admin API — no code changes or redeploys needed to update copy or projects. A single admin account (backed by `ADMIN_USERNAME` / `ADMIN_PASSWORD`) logs in to receive a Sanctum bearer token used for all write operations.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3 / Laravel 13
+- Laravel Sanctum for stateless bearer-token authentication
+- MySQL
+- Vite + Tailwind (asset bundling only — this app has no frontend UI)
 
-## Learning Laravel
+## Domain model
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Resource | Notes |
+|---|---|
+| `Hero` | Singleton — name, role |
+| `About` | Singleton — bio |
+| `Contact` | Singleton — LinkedIn, GitHub, Instagram, CV URL |
+| `Project` | Ordered list — title, description, tags, demo link, image, `show_demo_soon` flag |
+| `ExperienceRole` | Ordered list of roles, each with one or more `ExperienceCompany` entries |
+| `User` | Single admin user (username + hashed password), issues Sanctum tokens |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## API routes
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+All routes are prefixed with `/api`.
 
-## Agentic Development
+**Public**
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+POST /auth/login          Authenticate admin, returns a Sanctum bearer token
+GET  /content              Aggregate hero + about + contact + experiences
+GET  /projects              List projects
+GET  /experiences           List experience roles with their companies
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+**Protected** (`Authorization: Bearer <token>`)
 
-## Contributing
+```
+POST   /auth/logout
+GET    /auth/me
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+PUT    /admin/username
+PUT    /admin/password
 
-## Code of Conduct
+PUT    /content/hero
+PUT    /content/about
+PUT    /content/contact
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+PUT    /projects/reorder
+POST   /projects
+PUT|POST /projects/{id}
+DELETE /projects/{id}
 
-## Security Vulnerabilities
+PUT    /experiences/reorder
+POST   /experiences
+PUT    /experiences/{id}
+DELETE /experiences/{id}
+POST   /experiences/{id}/companies
+PUT    /experiences/{roleId}/companies/{companyId}
+DELETE /experiences/{roleId}/companies/{companyId}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Getting started
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Configure `.env`:
+
+- `DB_*` — MySQL connection
+- `ADMIN_USERNAME` / `ADMIN_PASSWORD` — admin login credentials
+- `FRONTEND_URL` — origin allowed by CORS
+- `SANCTUM_STATEFUL_DOMAINS` — leave empty; tokens are stateless bearer tokens, not cookie sessions
+
+Then run migrations and start the app:
+
+```bash
+php artisan migrate
+php artisan serve
+```
+
+Or use the all-in-one dev script (server + queue listener + log tailing + Vite):
+
+```bash
+composer run dev
+```
+
+## Testing
+
+```bash
+composer test
+```
+
+## Deployment
+
+Pushes to `main` trigger `.github/workflows/deploy.yml`, which installs dependencies, rsyncs the codebase to a Hostinger server over SSH, runs `php artisan migrate --force`, and caches config/routes/views.
 
 ## License
 
