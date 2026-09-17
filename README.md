@@ -92,6 +92,32 @@ Or use the all-in-one dev script (server + queue listener + log tailing + Vite):
 composer run dev
 ```
 
+## Docker
+
+Runs the API (PHP-FPM + nginx), a MySQL database, and — if you also have the [frontend repo](../personal-website-fe) checked out as a sibling directory — its Vite dev server, all with one command.
+
+```bash
+# clone the frontend as a sibling directory first, e.g.:
+#   ~/code/personal-website-be   (this repo)
+#   ~/code/personal-website-fe
+# or point at a different location via FRONTEND_PATH in .env
+
+cp .env.example .env
+docker compose up -d --build
+docker compose exec app php artisan migrate --force
+docker compose exec app php artisan db:seed   # optional — safe to re-run
+```
+
+- API: `http://localhost:8000`
+- Frontend dev server: `http://localhost:5173` (only starts successfully if the sibling `personal-website-fe` checkout — or `FRONTEND_PATH` — exists)
+- `docker compose exec app php artisan tinker` — REPL inside the app container
+- `docker compose logs -f app|web|frontend` — tail logs for a service
+- `docker compose down` — stop everything; add `-v` to also delete the MySQL data, installed Composer `vendor/`, and frontend `node_modules` volumes
+
+`APP_KEY` is generated automatically on first boot (into your bind-mounted `.env`) if it's empty. `DB_HOST`/`DB_PORT` in `.env` are for bare-metal use only — Compose overrides them to point at the `db` container.
+
+This setup is independent of `.github/workflows/deploy.yml` (Hostinger) and the frontend's own static-site deploy — neither is affected by Docker.
+
 ## Testing
 
 ```bash

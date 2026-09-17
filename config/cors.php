@@ -23,7 +23,7 @@ return [
     ]),
 
     'allowed_origins_patterns' => [
-        'http://localhost(:\d+)?$',   // any localhost port (dev)
+        '#^http://localhost(:\d+)?$#',   // any localhost port (dev)
     ],
 
     'allowed_headers' => ['Content-Type', 'Authorization', 'Accept'],
