@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/content/hero',    [ContentController::class, 'updateHero']);
     Route::put('/content/about',   [ContentController::class, 'updateAbout']);
     Route::put('/content/contact', [ContentController::class, 'updateContact']);
+    Route::put('/content/skills',  [ContentController::class, 'updateSkills']);
 
     // Projects — reorder MUST come before /{id} to avoid routing conflicts
     Route::put('/projects/reorder',              [ProjectController::class, 'reorder']);

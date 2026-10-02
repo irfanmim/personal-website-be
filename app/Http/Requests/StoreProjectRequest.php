@@ -16,8 +16,11 @@ class StoreProjectRequest extends FormRequest
         return [
             'title'       => ['required', 'string', 'max:100'],
             'description' => ['required', 'string', 'max:500'],
+            'role'        => ['nullable', 'string', 'max:100'],
             'tags'        => ['required', 'array'],
             'tags.*'      => ['string'],
+            'highlights'   => ['nullable', 'array'],
+            'highlights.*' => ['string', 'max:200'],
             'demo'           => ['nullable', 'url', 'max:300'],
             'show_demo_soon' => ['nullable', 'boolean'],
             'image'       => $this->hasFile('image')

@@ -36,7 +36,9 @@ class ProjectController extends Controller
         $project = Project::create([
             'title'          => $request->title,
             'description'    => $request->description,
+            'role'           => $request->role ?? '',
             'tags'           => $request->tags,
+            'highlights'     => $request->highlights ?? [],
             'demo'           => $request->demo ?? '',
             'show_demo_soon' => (bool) $request->input('show_demo_soon', false),
             'image'          => $this->resolveImagePath($request),
@@ -58,7 +60,9 @@ class ProjectController extends Controller
         $project->update([
             'title'          => $request->title,
             'description'    => $request->description,
+            'role'           => $request->role ?? '',
             'tags'           => $request->tags,
+            'highlights'     => $request->highlights ?? [],
             'demo'           => $request->demo ?? '',
             'show_demo_soon' => (bool) $request->input('show_demo_soon', false),
             'image'          => $this->resolveImagePath($request, $project->image),

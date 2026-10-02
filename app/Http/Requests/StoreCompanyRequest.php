@@ -14,9 +14,11 @@ class StoreCompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'summary' => ['required', 'string', 'max:150'],
-            'company' => ['required', 'string', 'max:150'],
-            'period'  => ['required', 'string', 'max:50'],
+            'summary'        => ['required', 'string', 'max:150'],
+            'company'        => ['required', 'string', 'max:150'],
+            'period'         => ['required', 'string', 'max:50'],
+            'achievements'   => ['nullable', 'array'],
+            'achievements.*' => ['string', 'max:200'],
         ];
     }
 }

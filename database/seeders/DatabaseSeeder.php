@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\ExperienceRole;
 use App\Models\Hero;
 use App\Models\Project;
+use App\Models\SkillArea;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -55,38 +56,32 @@ class DatabaseSeeder extends Seeder
             'cv_url'    => '',
         ]);
 
-        // ── Experience roles ──────────────────────────────────────────────────
-        $product = ExperienceRole::firstOrCreate(
-            ['role' => 'Product'],
-            ['order' => 0]
-        );
-
-        if ($product->companies()->count() === 0) {
-            $product->companies()->createMany([
-                ['summary' => 'Product Manager', 'company' => 'Visual Analysis',               'period' => 'Jan 2025 - Present',  'order' => 0],
-                ['summary' => 'Product Manager', 'company' => 'VA Insight Software Pte. Ltd.', 'period' => 'Jul 2023 - Dec 2024', 'order' => 1],
-            ]);
+        // ── Skill areas (hero charts) ─────────────────────────────────────────
+        // Fresh installs only, so levels edited in the admin are never overwritten.
+        if (SkillArea::count() === 0) {
+            foreach (SkillArea::defaults() as $i => $area) {
+                SkillArea::create($area + ['order' => $i]);
+            }
         }
 
-        $eng = ExperienceRole::firstOrCreate(
-            ['role' => 'Software Engineering'],
-            ['order' => 1]
-        );
-
-        if ($eng->companies()->count() === 0) {
-            $eng->companies()->createMany([
-                ['summary' => 'Development Team Lead', 'company' => 'VA Insight Software Pte. Ltd.', 'period' => 'Jul 2021 - Jul 2023', 'order' => 0],
-                ['summary' => 'Fullstack Developer',   'company' => 'VA Insight Software Pte. Ltd.', 'period' => 'Jul 2020 - Jul 2021', 'order' => 1],
-                ['summary' => 'Fullstack Developer',   'company' => 'VA Worldwide',                  'period' => 'Sep 2019 - Jul 2020', 'order' => 2],
-            ]);
+        // ── Experience roles ──────────────────────────────────────────────────
+        // Fresh installs only; CvExperienceSeeder overwrites, so don't clobber
+        // edits made through the admin on an existing database.
+        if (ExperienceRole::count() === 0) {
+            $this->call(CvExperienceSeeder::class);
         }
 
         // ── Projects ──────────────────────────────────────────────────────────
         if (Project::count() === 0) {
+            // Mirrors production; images are served from the frontend's public/images.
             Project::insert([
-                ['title' => 'ExamGrader', 'description' => 'A web application that implements a crowdsourcing method for exam assessment.',     'tags' => json_encode(['Web App', 'Fullstack', 'Django', 'React']), 'demo' => '', 'image' => '/images/exam-grader.svg', 'order' => 0, 'created_at' => now(), 'updated_at' => now()],
-                ['title' => 'Farmer App', 'description' => 'Mobile application that helps farmers manage their crops with real-time data and expert advice.', 'tags' => json_encode(['Mobile App', 'Frontend', 'React Native']), 'demo' => '', 'image' => '/images/farmer-app.svg',  'order' => 1, 'created_at' => now(), 'updated_at' => now()],
-                ['title' => 'GamesHub',   'description' => 'A web application that combine Augmented Reality with gamification.',                              'tags' => json_encode(['Web App', 'Frontend', 'React']),           'demo' => '', 'image' => '/images/games-hub.svg',  'order' => 2, 'created_at' => now(), 'updated_at' => now()],
+                ['title' => 'AI-Native SWE Concept', 'description' => 'A field guide to the concepts needed to build software with AI natively.', 'tags' => json_encode(['React', 'TypeScript']), 'demo' => 'https://ai-native-swe-concept.irfanmim.com/', 'image' => '/images/ai-native-swe-concept.png', 'order' => 0, 'created_at' => now(), 'updated_at' => now()],
+                ['title' => 'FinTrack',     'description' => 'A personal finance web app that helps you track spending, manage budgets, and stay on top of your financial goals.', 'tags' => json_encode(['Web App', 'React', 'Laravel', 'Fullstack']), 'demo' => 'https://finance.irfanmim.com', 'image' => '/images/fintrack.png',     'order' => 1, 'created_at' => now(), 'updated_at' => now()],
+                ['title' => 'Nexus',        'description' => 'A personal learning OS that maps your goals, tracks your progress, and surfaces what to focus on next.',            'tags' => json_encode(['Web App', 'React', 'Laravel', 'Fullstack']), 'demo' => 'https://nexus.irfanmim.com',   'image' => '/images/nexus.png',        'order' => 2, 'created_at' => now(), 'updated_at' => now()],
+                ['title' => 'LearnTracker', 'description' => 'A personal dashboard to track your learning platforms, subscriptions, and course progress in one place.',               'tags' => json_encode(['Web App', 'Vue', 'Laravel', 'Fullstack']),   'demo' => 'https://manager.irfanmim.com', 'image' => '/images/learntracker.png', 'order' => 3, 'created_at' => now(), 'updated_at' => now()],
+                ['title' => 'ExamGrader',   'description' => 'A web application that implements a crowdsourcing method for exam assessment.',     'tags' => json_encode(['Web App', 'Fullstack', 'Django', 'React']), 'demo' => '', 'image' => '/images/exam-grader.svg', 'order' => 4, 'created_at' => now(), 'updated_at' => now()],
+                ['title' => 'Farmer App',   'description' => 'Mobile application that helps farmers manage their crops with real-time data and expert advice.', 'tags' => json_encode(['Mobile App', 'Frontend', 'React Native']), 'demo' => '', 'image' => '/images/farmer-app.svg',  'order' => 5, 'created_at' => now(), 'updated_at' => now()],
+                ['title' => 'GamesHub',     'description' => 'A web application that combine Augmented Reality with gamification.',                              'tags' => json_encode(['Web App', 'Frontend', 'React']),           'demo' => '', 'image' => '/images/games-hub.svg',  'order' => 6, 'created_at' => now(), 'updated_at' => now()],
             ]);
         }
     }

@@ -91,10 +91,11 @@ class ExperienceController extends Controller
         $maxOrder = $role->companies()->max('order') ?? -1;
 
         $company = $role->companies()->create([
-            'summary' => $request->summary,
-            'company' => $request->company,
-            'period'  => $request->period,
-            'order'   => $maxOrder + 1,
+            'summary'      => $request->summary,
+            'company'      => $request->company,
+            'period'       => $request->period,
+            'order'        => $maxOrder + 1,
+            'achievements' => $request->achievements ?? [],
         ]);
 
         return response()->json($company, 201);
@@ -112,9 +113,10 @@ class ExperienceController extends Controller
         }
 
         $company->update([
-            'summary' => $request->summary,
-            'company' => $request->company,
-            'period'  => $request->period,
+            'summary'      => $request->summary,
+            'company'      => $request->company,
+            'period'       => $request->period,
+            'achievements' => $request->achievements ?? [],
         ]);
 
         return response()->json($company->fresh());

@@ -28,3 +28,6 @@ Thumbs.db
 
 # Windows Alternate Data Streams
 *:Zone.Identifier
+
+# Private CV data for CvExperienceSeeder
+/database/seeders/data/*.private.json

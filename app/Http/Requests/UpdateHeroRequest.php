@@ -14,8 +14,9 @@ class UpdateHeroRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:100'],
-            'role' => ['required', 'string', 'max:200'],
+            'name'    => ['required', 'string', 'max:100'],
+            'role'    => ['required', 'string', 'max:200'],
+            'tagline' => ['nullable', 'string', 'max:200'],
         ];
     }
 }

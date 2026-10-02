@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateAboutRequest;
 use App\Http\Requests\UpdateContactRequest;
 use App\Http\Requests\UpdateHeroRequest;
+use App\Http\Requests\UpdateSkillsRequest;
 use App\Models\About;
 use App\Models\Contact;
 use App\Models\ExperienceRole;
 use App\Models\Hero;
+use App\Models\SkillArea;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class ContentController extends Controller
 {
@@ -26,14 +29,49 @@ class ContentController extends Controller
             'experiences' => ExperienceRole::with(['companies' => fn ($q) => $q->orderBy('order')])
                                 ->orderBy('order')
                                 ->get(),
+            'skills'      => $this->formatSkills(),
         ]);
+    }
+
+    /**
+     * Replace the whole skills list (small, ordered by array position).
+     * Sent as one list so reordering, hiding and deleting are a single atomic save.
+     */
+    public function updateSkills(UpdateSkillsRequest $request): JsonResponse
+    {
+        DB::transaction(function () use ($request) {
+            $keys = [];
+            foreach ($request->input('skills') as $i => $area) {
+                $keys[] = $area['key'];
+                SkillArea::updateOrCreate(
+                    ['key' => $area['key']],
+                    [
+                        'label'       => $area['label'],
+                        'short_label' => $area['shortLabel'],
+                        'pillar'      => $area['pillar'],
+                        'level'       => $area['level'],
+                        'tech'        => array_values($area['tech']),
+                        'visible'     => $area['visible'],
+                        'order'       => $i,
+                    ]
+                );
+            }
+            SkillArea::whereNotIn('key', $keys)->delete();
+        });
+
+        return response()->json($this->formatSkills());
+    }
+
+    private function formatSkills(): array
+    {
+        return SkillArea::orderBy('order')->get()->map->toApiArray()->all();
     }
 
     /** Update the hero section (singleton). */
     public function updateHero(UpdateHeroRequest $request): JsonResponse
     {
         $hero = Hero::firstOrNew([]);
-        $hero->fill($request->only('name', 'role'))->save();
+        $hero->fill($request->only('name', 'role', 'tagline'))->save();
 
         return response()->json($hero);
     }

@@ -9,7 +9,7 @@ class ExperienceCompany extends Model
 {
     protected $table = 'experience_companies';
 
-    protected $fillable = ['experience_id', 'summary', 'company', 'period', 'order'];
+    protected $fillable = ['experience_id', 'summary', 'company', 'period', 'order', 'achievements'];
 
     protected $hidden = ['experience_id', 'created_at', 'updated_at'];
 
@@ -18,7 +18,8 @@ class ExperienceCompany extends Model
     protected function casts(): array
     {
         return [
-            'order' => 'integer',
+            'order'        => 'integer',
+            'achievements' => 'array',
         ];
     }
 

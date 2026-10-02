@@ -8,7 +8,7 @@ class Project extends Model
 {
     protected $table = 'projects';
 
-    protected $fillable = ['title', 'description', 'tags', 'demo', 'show_demo_soon', 'image', 'order'];
+    protected $fillable = ['title', 'description', 'role', 'tags', 'highlights', 'demo', 'show_demo_soon', 'image', 'order'];
 
     protected $hidden = ['created_at', 'updated_at'];
 
@@ -16,6 +16,7 @@ class Project extends Model
     {
         return [
             'tags'           => 'array',
+            'highlights'     => 'array',
             'order'          => 'integer',
             'show_demo_soon' => 'boolean',
         ];
