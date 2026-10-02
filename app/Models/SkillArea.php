@@ -35,7 +35,7 @@ class SkillArea extends Model
             'pillar'     => $this->pillar,
             'level'      => $this->level,
             'tech'       => $this->tech ?? [],
-            'visible'    => $this->visible,
+            'visible'    => (bool) $this->getAttribute('visible'),
         ];
     }
 
