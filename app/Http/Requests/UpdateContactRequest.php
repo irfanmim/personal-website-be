@@ -14,6 +14,8 @@ class UpdateContactRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'heading'   => ['nullable', 'string', 'max:100'],
+            'blurb'     => ['nullable', 'string', 'max:200'],
             'linkedin'  => ['required', 'url', 'max:300'],
             'github'    => ['required', 'url', 'max:300'],
             'instagram' => ['nullable', 'url', 'max:300'],

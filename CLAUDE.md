@@ -36,7 +36,8 @@ root CLAUDE.md for how the two fit together.
 - Protected (`auth:sanctum`, bearer token from `/auth/login`):
   - `POST /auth/logout`, `GET /auth/me`
   - `PUT /admin/username`, `PUT /admin/password`
-  - `PUT /content/hero|about|contact`
+  - `PUT /content/hero|about|contact` — hero also carries `greeting`/`headline`, contact
+    `heading`/`blurb`, so the frontend has no hardcoded profile copy
   - `PUT /content/skills` — replaces the whole hero-chart skill list (`skills[]` with
     `key, label, shortLabel, pillar, level 1–10, tech[], visible`; array order = display order).
     `GET /content` returns the same list under `skills`; the seeder only fills it on a fresh

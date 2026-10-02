@@ -71,7 +71,13 @@ class ContentController extends Controller
     public function updateHero(UpdateHeroRequest $request): JsonResponse
     {
         $hero = Hero::firstOrNew([]);
-        $hero->fill($request->only('name', 'role', 'tagline'))->save();
+        $hero->fill([
+            'name'     => $request->name,
+            'role'     => $request->role,
+            'tagline'  => $request->tagline,
+            'greeting' => $request->greeting ?? '',
+            'headline' => $request->headline ?? '',
+        ])->save();
 
         return response()->json($hero);
     }
@@ -90,6 +96,8 @@ class ContentController extends Controller
     {
         $contact = Contact::firstOrNew([]);
         $contact->fill([
+            'heading'   => $request->heading ?? '',
+            'blurb'     => $request->blurb ?? '',
             'linkedin'  => $request->linkedin,
             'github'    => $request->github,
             'instagram' => $request->instagram ?? '',
@@ -105,7 +113,7 @@ class ContentController extends Controller
     private function formatContact(?Contact $contact): array
     {
         if (! $contact) {
-            return ['linkedin' => '', 'github' => '', 'instagram' => '', 'cvUrl' => ''];
+            return ['heading' => '', 'blurb' => '', 'linkedin' => '', 'github' => '', 'instagram' => '', 'cvUrl' => ''];
         }
 
         return $contact->toApiArray();

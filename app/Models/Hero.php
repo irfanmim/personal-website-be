@@ -8,7 +8,7 @@ class Hero extends Model
 {
     protected $table = 'hero';
 
-    protected $fillable = ['name', 'role', 'tagline'];
+    protected $fillable = ['name', 'role', 'tagline', 'greeting', 'headline'];
 
     protected $hidden = ['created_at', 'updated_at'];
 }

@@ -8,7 +8,7 @@ class Contact extends Model
 {
     protected $table = 'contact';
 
-    protected $fillable = ['linkedin', 'github', 'instagram', 'cv_url'];
+    protected $fillable = ['heading', 'blurb', 'linkedin', 'github', 'instagram', 'cv_url'];
 
     protected $hidden = ['id', 'created_at', 'updated_at'];
 
@@ -18,6 +18,8 @@ class Contact extends Model
     public function toApiArray(): array
     {
         return [
+            'heading'   => $this->heading,
+            'blurb'     => $this->blurb,
             'linkedin'  => $this->linkedin,
             'github'    => $this->github,
             'instagram' => $this->instagram,

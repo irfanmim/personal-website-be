@@ -39,6 +39,8 @@ class DatabaseSeeder extends Seeder
         Hero::firstOrCreate([], [
             'name' => 'M. Irfan Maulana',
             'role' => 'Software Engineer | Product Manager | Sports Enthusiast.',
+            'greeting' => 'Hi! Welcome!',
+            'headline' => "I'm Irfan",
         ]);
 
         // ── About ─────────────────────────────────────────────────────────────
@@ -50,6 +52,8 @@ class DatabaseSeeder extends Seeder
 
         // ── Contact ───────────────────────────────────────────────────────────
         Contact::firstOrCreate([], [
+            'heading'   => 'Get in touch',
+            'blurb'     => "Have a role in mind? Let's connect.",
             'linkedin'  => 'https://www.linkedin.com/in/irfanmim',
             'github'    => 'https://github.com/irfanmim',
             'instagram' => 'https://www.instagram.com/irfanmim',
